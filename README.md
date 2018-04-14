@@ -14,4 +14,6 @@
 * Data Base of Image Caption Papers: https://github.com/SeitaroShinagawa/FavoritePapers/blob/master/image_caption.md
  
 
-
+* Hierarchical Question-Image Co-Attention for Visual Question Answering
+  * Paper: https://arxiv.org/abs/1606.00061
+  * Code: https://github.com/jiasenlu/HieCoAttenVQA
