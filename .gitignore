@@ -2,3 +2,6 @@
 .idea/
 *.idea
 zip/
+data/Images
+data/Questions
+data/Annotations
