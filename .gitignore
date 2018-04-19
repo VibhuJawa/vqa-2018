@@ -1,6 +1,8 @@
 *.pyc
 .idea/
 *.idea
+*.simg
+*.out
 zip/
 data/Images
 data/Questions
