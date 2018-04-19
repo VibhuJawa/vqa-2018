@@ -59,7 +59,7 @@ Usage: vqa.getImgIds(quesIds=[], quesTypes=[], ansTypes=[])
 Above method can be used to retrieve imageIds for given question Ids or given question types or given answer types.
 """
 ids = vqa.getImgIds()
-annIds = vqa.getQuesIds(imgIds=random.sample(ids, 5));
+annIds = vqa.getQuesIds(imgIds=random.sample(ids, 5))
 anns = vqa.loadQA(annIds)
 randomAnn = random.choice(anns)
 vqa.showQA([randomAnn])
