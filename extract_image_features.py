@@ -18,7 +18,7 @@ from models.extraction_model import get_pretrained_model
 # import vqa.models.convnets as convnets
 # import vqa.datasets as datasets
 # from vqa.lib.dataloader import DataLoader
-# from vqa.lib.logger import AvgMeter
+from utils.logger import AvgMeter
 from utils.ImagesFolder import ImagesFolder
 from torch.utils.data.dataloader import DataLoader
 
@@ -29,7 +29,7 @@ parser.add_argument('--dataset', default='mscocoa',
                     help='dataset type: mscoco (default) | abstract_v002')
 
 # TODO change it default folder on MARCC ~/scratch/vqa2018-data/Images/
-parser.add_argument('--vqa_data', default='~/scratch/vqa2018/Images/',
+parser.add_argument('--vqa_data', default='/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data/Images/',
                     help='dir dataset to download or/and load images')
 
 parser.add_argument('--data_split', default='train2014', required=True, type=str,
@@ -59,7 +59,7 @@ def main():
     args = parser.parse_args()
     args.cuda = torch.cuda.is_available() and args.cuda
 
-    logging.info("Using pre-trained model '{}'".format(args.arch))
+    print("Using pre-trained model '{}'".format(args.arch))
 
     # if not args.cuda:
     #     model = get_pretrained_model(args.arch, cuda=args.cuda, data_parallel=False)
@@ -95,7 +95,7 @@ def main():
         data_parallel = True
 
     model = get_pretrained_model(args.arch, args.cuda, data_parallel)
-
+    #print(type(model))
     extract(data_loader, model, path_file)
 
 
@@ -107,7 +107,8 @@ def extract(data_loader, model, path_file):
     # estimate output shapes
     output = model(Variable(torch.ones(1, 3, args.size, args.size),
                             volatile=True))
-    return
+    print(output.shape)
+    print(type(output))
     nb_images = len(data_loader.dataset)
     shape_att = (nb_images, output.size(1), output.size(2), output.size(3))
     print('Warning: shape_att={}'.format(shape_att))
@@ -125,23 +126,17 @@ def extract(data_loader, model, path_file):
     for i, input in enumerate(data_loader):
         input_var = Variable(input['visual'], volatile=True)
         output_att = model(input_var)
-
-        nb_regions = output_att.size(2) * output_att.size(3)
-        output_noatt = output_att.sum(3).sum(2).div(nb_regions).view(-1, 2048)
+        
 
         batch_size = output_att.size(0)
-        if mode == 'both' or mode == 'att':
-            hdf5_att[idx:idx + batch_size] = output_att.data.cpu().numpy()
-        if mode == 'both' or mode == 'noatt':
-            hdf5_noatt[idx:idx + batch_size] = output_noatt.data.cpu().numpy()
+        hdf5_att[idx:idx + batch_size] = output_att.data.cpu().numpy()
         idx += batch_size
 
         torch.cuda.synchronize()
         batch_time.update(time.time() - end)
         end = time.time()
 
-        if i % 1 == 0:
-            print('Extract: [{0}/{1}]\t'
+        print('Extract: [{0}/{1}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'.format(
                 i, len(data_loader),
@@ -152,7 +147,7 @@ def extract(data_loader, model, path_file):
 
     # Saving image names in the same order than extraction
     with open(path_txt, 'w') as handle:
-        for name in data_loader.dataset.dataset.imgs:
+        for name in data_loader.dataset.imgs:
             handle.write(name + '\n')
 
     end = time.time() - begin

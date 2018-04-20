@@ -91,3 +91,5 @@ def get_pretrained_model(architecture="resnet152", cuda=True, data_parallel=True
 
     if cuda:
         model.cuda()
+
+    return model
