@@ -48,11 +48,11 @@ def extract_annotations(data_dir = './'):
 
     print('Loading annotations and questions...')
     annotations_train_1 = json.load(
-        open(os.path.join(data_dir, 'annotations', 'v2_mscoco_train2014_annotations.json'), 'r'))
+        open(os.path.join(data_dir, 'Annotations', 'v2_mscoco_train2014_annotations.json'), 'r'))
     annotations_train_2 = json.load(
-        open(os.path.join(data_dir, 'annotations', 'abstract_v002_train2015_annotations.json'), 'r'))
+        open(os.path.join(data_dir, 'Annotations', 'abstract_v002_train2015_annotations.json'), 'r'))
     annotations_train_3 = json.load(
-        open(os.path.join(data_dir, 'annotations', 'abstract_v002_train2017_annotations.json'), 'r'))
+        open(os.path.join(data_dir, 'Annotations', 'abstract_v002_train2017_annotations.json'), 'r'))
 
     questions_train_1 = json.load(
         open(os.path.join(data_dir, 'Questions', 'v2_OpenEnded_mscoco_train2014_questions.json'), 'r'))
@@ -61,11 +61,11 @@ def extract_annotations(data_dir = './'):
     questions_train_3 = json.load(
         open(os.path.join(data_dir, 'Questions', 'OpenEnded_abstract_v002_train2017_questions.json'), 'r'))
 
-    annotations_val_1 = json.load(open(os.path.join(data_dir, 'annotations', 'v2_mscoco_val2014_annotations.json'), 'r'))
+    annotations_val_1 = json.load(open(os.path.join(data_dir, 'Annotations', 'v2_mscoco_val2014_annotations.json'), 'r'))
     annotations_val_2 = json.load(
-        open(os.path.join(data_dir, 'annotations', 'abstract_v002_val2015_annotations.json'), 'r'))
+        open(os.path.join(data_dir, 'Annotations', 'abstract_v002_val2015_annotations.json'), 'r'))
     annotations_val_3 = json.load(
-        open(os.path.join(data_dir, 'annotations', 'abstract_v002_val2017_annotations.json'), 'r'))
+        open(os.path.join(data_dir, 'Annotations', 'abstract_v002_val2017_annotations.json'), 'r'))
 
     questions_val_1 = json.load(
         open(os.path.join(data_dir, 'Questions', 'v2_OpenEnded_mscoco_val2014_questions.json'), 'r'))
