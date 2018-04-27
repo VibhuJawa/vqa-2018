@@ -284,7 +284,7 @@ if __name__ == "__main__":
                         help='Max number of words in a caption. Captions longer get clipped')
     parser.add_argument('--minwcount', default=0, type=int,
                         help='Words that occur less than that are removed from vocab')
-    parser.add_argument('--nlp', default='mcb'g, type=str, help='Token method ; Options: nltk | mcb | naive')
+    parser.add_argument('--nlp', default='mcb', type=str, help='Token method ; Options: nltk | mcb | naive')
     parser.add_argument('--pad', default='left', type=str,
                         help='Padding ; Options: right (finish by zeros) | left (begin by zeros)')
     args = parser.parse_args()
