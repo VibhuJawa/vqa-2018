@@ -23,6 +23,8 @@ parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
 parser.add_argument('--parallel', action='store_true', default=False,
                     help='enables CUDA training')
+parser.add_argument('--num-workers',  default=8,
+                    help='enables CUDA training')
 
 parser.add_argument('--cuda', action='store_true', default=True,
                     help='enables CUDA training')
@@ -40,9 +42,9 @@ if args.cuda:
 opt = {'dir': '/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 if args.cuda:
-    kwargs = {'num_workers': 8, 'pin_memory': True}
+    kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
 else:
-    kwargs = {'num_workers': 1, 'pin_memory': True}
+    kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
 
 train_dataset = VQADataset("train", opt)
 train_loader = train_dataset.data_loader(kwargs, shuffle=True, batch_size=args.batch_size, **kwargs)
