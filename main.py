@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.autograd import Variable
-from dataloaders import VQADataset
+from dataloaders.VQADataset import VQADataset
 import time
 from models.combined_model import returnmodel
 
@@ -57,7 +57,6 @@ test_loader = test_dataset.data_loader(shuffle=False, batch_size=args.test_batch
 
 model = returnmodel(args.cuda, args.parallel)
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
-loss = nn.CrossEntropy()
 
 def train(epoch):
     begin = time.time()
