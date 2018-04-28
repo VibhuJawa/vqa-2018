@@ -21,6 +21,7 @@ class VQADataset(AbstractVQADataset):
             "opt['vqa'] does not have 'samplingans' " \
             "entry. Set it to True or False."
 
+        self.hdf5_file_dict = {}
         if self.data_split == 'test':
             path_testdevset = os.path.join(self.subdir_processed, 'testdevset.pickle')
             with open(path_testdevset, 'rb') as handle:
@@ -69,9 +70,6 @@ class VQADataset(AbstractVQADataset):
         path_hdf5 = os.path.join(self.opt['dir'], self.opt['images'],os.path.dirname(imgurl), 'set.hdf5')
         path_txt = os.path.join(self.opt['dir'],self.opt['images'],os.path.dirname(imgurl), 'set.txt')
         flag_exist = False
-        print(file_name)
-        print(path_hdf5)
-        print(path_txt)
         with open(path_txt, 'r') as handle:
             for index, line in enumerate(handle):
                 if line.strip() == file_name.strip():
@@ -83,7 +81,12 @@ class VQADataset(AbstractVQADataset):
             # Cheap hack if image does not exist
             item['image'] = torch.LongTensor(2048,14,14).zero_()
         else:
-            hdf5_file = h5py.File(path_hdf5, 'r')['att']
+            if path_hdf5 not in self.hdf5_file_dict:
+                hdf5_file = h5py.File(path_hdf5, 'r')['att']
+                self.hdf5_file_dict[path_hdf5] = hdf5_file
+            else:
+                hdf5_file = self.hdf5_file_dict[path_hdf5]
+
             item['image'] = torch.LongTensor(hdf5_file[index]) 
         
         item['word_count'] = item_vqa['question_length']
