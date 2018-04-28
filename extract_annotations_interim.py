@@ -83,14 +83,14 @@ def extract_annotations(data_dir = './'):
         open(os.path.join(data_dir, 'Questions', 'v2_OpenEnded_mscoco_test-dev2015_questions.json'), 'r'))
 
     val_merge_1 = interim(questions=questions_val_1['questions'], annotations=annotations_val_1['annotations'],
-                          split='val',image_format='mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.png')
+                          split='val',image_format='mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.jpg')
     val_merge_2 = interim(questions=questions_val_2['questions'], annotations=annotations_val_2['annotations'],
                           split='val',image_format='abstract_v002/extracted_{}2015/abstract_v002_{}2015_{:0>12}.png')
     val_merge_3 = interim(questions=questions_val_3['questions'], annotations=annotations_val_3['annotations'],
                           split='val',image_format='abstract_v002/extracted_scene_img_abstract_v002_{}2017/abstract_v002_{}2015_{:0>12}.png')
 
     train_merge_1 = interim(questions=questions_train_1['questions'], annotations=annotations_train_1['annotations'],
-                            split='train',image_format='mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.png')
+                            split='train',image_format='mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.jpg')
 
     train_merge_2 = interim(questions=questions_train_2['questions'], annotations=annotations_train_2['annotations'],
                             split='train', image_format='abstract_v002/extracted_{}2015/abstract_v002_{}2015_{:0>12}.png')
