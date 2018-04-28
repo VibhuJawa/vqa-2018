@@ -43,7 +43,7 @@ class MergedModel(nn.Module):
         super().__init__()
         self.qmodel = qmodel
         self.imgmodel = imgmodel
-        self.avgpool = nn.AvgPool2d((2, 1), stride=(1, 1))
+        self.avgpool = nn.AvgPool2d((2, 1))
         self.fc1 = nn.Linear(concat_size, num_classes)
 
     def forward(self, question, image):
@@ -52,13 +52,12 @@ class MergedModel(nn.Module):
         x = torch.stack([img_out, q_out], dim=1)
         x = self.avgpool(x)
         x = x.squeeze()
-        x = F.log_softmax(self.fc1(x))
+        x = F.log_softmax(self.fc1(x), dim=1)
 
         return x
 
 
-def returnmodel(cuda=True, data_parallel=True, embedding_size=300, hidden_size=1024, question_vocab_size=13390,
-                linear_size=2048, num_classes=2000):
+def returnmodel(cuda=True, data_parallel=True, embedding_size=300, hidden_size=256, question_vocab_size=13391, linear_size=2048, num_classes=2000):
     data_parallel = cuda and data_parallel
 
     questionmodel = QuestionModel(embedding_size, hidden_size, question_vocab_size, linear_size)
@@ -70,3 +69,5 @@ def returnmodel(cuda=True, data_parallel=True, embedding_size=300, hidden_size=1
 
     if cuda and not data_parallel:
         model.cuda()
+
+    return model
