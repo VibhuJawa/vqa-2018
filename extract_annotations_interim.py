@@ -13,7 +13,7 @@ def get_subtype(split='train'):
         return 'test2015'
 
 
-def get_image_name_old(subtype='train2014', image_id='1', format='%s/COCO_%s_%012d.jpg'):
+def get_image_name_old(subtype='COCO', image_id='1', format='%s/COCO_%s_%012d.jpg'):
     return format % (subtype, subtype, image_id)
 
 
@@ -21,13 +21,15 @@ def get_image_name(subtype='train2014', image_id='1', format='COCO_%s_%012d.jpg'
     return format % (subtype, image_id)
 
 
-def interim(questions, split='train', annotations=[]):
+def interim(questions, split='train', annotations=[],image_format = 'mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.png'):
     print('Interim', split)
     data = []
     for i in range(len(questions)):
         row = {}
         row['question_id'] = questions[i]['question_id']
-        row['image_name'] = get_image_name(get_subtype(split), questions[i]['image_id'])
+
+        # row['image_name'] = get_image_name(get_subtype(split), questions[i]['image_id'])
+        row['image_name'] = image_format.format(split,split,questions[i]['image_id'])
         row['question'] = questions[i]['question']
         if split in ['train', 'val', 'trainval']:
             row['answer'] = annotations[i]['multiple_choice_answer']
@@ -81,21 +83,25 @@ def extract_annotations(data_dir = './'):
         open(os.path.join(data_dir, 'Questions', 'v2_OpenEnded_mscoco_test-dev2015_questions.json'), 'r'))
 
     val_merge_1 = interim(questions=questions_val_1['questions'], annotations=annotations_val_1['annotations'],
-                          split='val')
+                          split='val',image_format='mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.png')
     val_merge_2 = interim(questions=questions_val_2['questions'], annotations=annotations_val_2['annotations'],
-                          split='val')
+                          split='val',image_format='abstract_v002/extracted_{}2015/abstract_v002_{}2015_{:0>12}.png')
     val_merge_3 = interim(questions=questions_val_3['questions'], annotations=annotations_val_3['annotations'],
-                          split='val')
+                          split='val',image_format='abstract_v002/extracted_scene_img_abstract_v002_{}2017/abstract_v002_{}2015_{:0>12}.png')
 
     train_merge_1 = interim(questions=questions_train_1['questions'], annotations=annotations_train_1['annotations'],
-                            split='train')
-    train_merge_2 = interim(questions=questions_train_2['questions'], annotations=annotations_train_2['annotations'],
-                            split='train')
-    train_merge_3 = interim(questions=questions_train_3['questions'], annotations=annotations_train_3['annotations'],
-                            split='train')
+                            split='train',image_format='mscocoa/extracted_{}2014/COCO_{}2014_{:0>12}.png')
 
-    testset = interim(questions=questions_test['questions'], split='test')
-    test_dev_set = interim(questions=question_test_dev['questions'],split='test_dev')
+    train_merge_2 = interim(questions=questions_train_2['questions'], annotations=annotations_train_2['annotations'],
+                            split='train', image_format='abstract_v002/extracted_{}2015/abstract_v002_{}2015_{:0>12}.png')
+
+    train_merge_3 = interim(questions=questions_train_3['questions'], annotations=annotations_train_3['annotations'],
+                            split='train',image_format='abstract_v002/extracted_scene_img_abstract_v002_{}2017/abstract_v002_{}2015_{:0>12}.png')
+
+
+
+    testset = interim(questions=questions_test['questions'], split='test',image_format='mscocoa/extracted_test{}/COCO_{}2015_{:0>12}.png')
+    test_dev_set = interim(questions=question_test_dev['questions'],split='test_dev',image_format='mscocoa/extracted_test{}/COCO_{}2015_{:0>12}.png')
 
     trainset = train_merge_1 + train_merge_2 + train_merge_3
     valset = val_merge_1 + val_merge_2 + val_merge_3
