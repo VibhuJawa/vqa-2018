@@ -8,4 +8,6 @@ zip/
 data/Images
 data/Questions
 data/Annotations
+data/interim
+data/processed
 DiscardNotebooks/
