@@ -14,6 +14,8 @@ from utils import utils, logger
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+parser.add_argument('--logdir', default="logs", type=str, help='log directory')
+
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
@@ -90,7 +92,7 @@ else:
 if exp_logger is None:
     # Set loggers
     exp_name = os.path.basename(logdir) # add timestamp
-    exp_logger = logger.Experiment(exp_name, logger.options)
+    exp_logger = logger.Experiment(exp_name )
     exp_logger.add_meters('train', logger.make_meters())
     exp_logger.add_meters('test', logger.make_meters())
     exp_logger.add_meters('val', logger.make_meters())
@@ -119,7 +121,8 @@ def train(epoch, logger):
 
         # Compute output and loss
         output = model(question, image)
-        torch.cuda.synchronize()
+        if args.cuda:
+            torch.cuda.synchronize()
         loss = F.nll_loss(output, target)
 
         # Log the loss
@@ -132,9 +135,11 @@ def train(epoch, logger):
 
         optimizer.zero_grad()
         loss.backward()
-        torch.cuda.synchronize()
+        if args.cuda:
+            torch.cuda.synchronize()
         optimizer.step()
-        torch.cuda.synchronize()
+        if args.cuda:
+            torch.cuda.synchronize()
 
         meters['batch_time'].update(time.time() - begin, n=batch_size)
         begin = time.time()
