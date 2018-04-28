@@ -69,9 +69,12 @@ class VQADataset(AbstractVQADataset):
         path_hdf5 = os.path.join(self.opt['dir'], self.opt['images'],os.path.dirname(imgurl), 'set.hdf5')
         path_txt = os.path.join(self.opt['dir'],self.opt['images'],os.path.dirname(imgurl), 'set.txt')
         flag_exist = False
+        print(file_name)
+        print(path_hdf5)
+        print(path_txt)
         with open(path_txt, 'r') as handle:
             for index, line in enumerate(handle):
-                if line == imgurl:
+                if line == file_name:
                     flag_exist = True
                     break
         

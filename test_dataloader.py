@@ -8,8 +8,7 @@ D = VQADataset("train", opt)
 dl = D.data_loader(batch_size=3, num_workers=4,shuffle=False)
 print("Time to load Data loader : ",time.time() - begin)
 for i in dl:
-    for key in i:
-        pass
+    break
 print("Time for iterating over {} questions : {} \nTime per question : {}".format(len(D), time.time() - begin, len(D)/(time.time() - begin)))
 
 begin = time.time()
@@ -17,8 +16,7 @@ D = VQADataset("test", opt)
 dl = D.data_loader(batch_size=3, num_workers=4,shuffle=False)
 print("Time to load Data loader : ",time.time() - begin)
 for i in dl:
-    for key in i:
-        pass
+    break
 print("Time for iterating over {} questions : {} \nTime per question : {}".format(len(D), time.time() - begin, len(D)/(time.time() - begin)))
 
 begin = time.time()
@@ -26,8 +24,7 @@ D = VQADataset("dev", opt)
 dl = D.data_loader(batch_size=3, num_workers=4,shuffle=False)
 print("Time to load Data loader : ",time.time() - begin)
 for i in dl:
-    for key in i:
-        pass
+    break
 print("Time for iterating over {} questions : {} \nTime per question : {}".format(len(D), time.time() - begin, len(D)/(time.time() - begin)))
 
 begin = time.time()
@@ -35,6 +32,5 @@ D = VQADataset("testdev", opt)
 dl = D.data_loader(batch_size=3, num_workers=4,shuffle=False)
 print("Time to load Data loader : ",time.time() - begin)
 for i in dl:
-    for key in i:
-        pass
+    break
 print("Time for iterating over {} questions : {} \nTime per question : {}".format(len(D), time.time() - begin, len(D)/(time.time() - begin)))
