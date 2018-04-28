@@ -33,16 +33,18 @@ parser.add_argument('--seed', type=int, default=1, metavar='S',
 parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
-args.cuda = args.no_cuda and torch.cuda.is_available()
+args.cuda = args.cuda and torch.cuda.is_available()
 args.parallel = args.parallel and args.cuda
+
 torch.manual_seed(args.seed)
 if args.cuda:
+    print("Cuda is available")
     torch.cuda.manual_seed(args.seed)
 
 opt = {'dir': '/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 if args.cuda:
-    kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
+    kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
 else:
     kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
 
@@ -50,7 +52,7 @@ train_dataset = VQADataset("train", opt)
 train_loader = train_dataset.data_loader(kwargs, shuffle=True, batch_size=args.batch_size, **kwargs)
 
 test_dataset = VQADataset("dev", opt)
-test_loader = test_dataset.data_loader(shuffle=True, batch_size=args.test_batch_size, **kwargs)
+test_loader = test_dataset.data_loader(shuffle=False, batch_size=args.test_batch_size, **kwargs)
 
 
 model = returnmodel(args.cuda, args.parallel)
@@ -80,7 +82,7 @@ def train(epoch):
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                        100. * batch_idx / len(train_loader), loss.data[0], time.time() - begin))
 
-
+            
 def test(loss):
     begin = time.time()
 

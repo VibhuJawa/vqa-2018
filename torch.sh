@@ -1,16 +1,17 @@
 #!/bin/bash
-#SBATCH -N 4
-#SBATCH -n 24
+#SBATCH -N 1
+#SBATCH -n 4
 #SBATCH -p gpu
-#SBATCH --gres=gpu:4
-#SBATCH -t 04:55:0
+#SBATCH --gres=gpu:1
+#SBATCH -t 0:2:00
 
 module load cuda/9.0
 #module load singularity/2.4
 
 python test.py
-python extract_image_features.py --data_split train2014
-python extract_image_features.py --data_split val2014
+python main.py --num-workers 4
+#python extract_image_features.py --data_split train2014
+#python extract_image_features.py --data_split val2014
 # redefine SINGULARITY_HOME to mount current working directory to base $HOME
 #export SINGULARITY_HOME=$PWD:/home/$USER
 
