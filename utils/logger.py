@@ -135,3 +135,14 @@ class ValueMeter(object):
 
     def value(self):
         return self.val
+
+def make_meters():
+    meters_dict = {
+        'loss': AvgMeter(),
+        'acc1': AvgMeter(),
+        'acc5': AvgMeter(),
+        'batch_time': AvgMeter(),
+        'data_time': AvgMeter(),
+        'epoch_time': SumMeter()
+    }
+    return meters_dict
