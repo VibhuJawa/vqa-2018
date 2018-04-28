@@ -4,6 +4,7 @@ import torch
 # import ..utils as data
 import copy
 import numpy as np
+import h5py
 from .AbstractDataset import AbstractVQADataset
 from utils.dataloader import DataLoader
 
@@ -63,9 +64,25 @@ class VQADataset(AbstractVQADataset):
                 item['answer'] = int(np.random.choice(item_vqa['answers_aid'], p=proba))
             else:
                 item['answer'] = item_vqa['answer_aid']
-        imgurl = self.get_img_url(item_vqa['image_name'])
-        path_hdf5 = os.path.join(os.path.dirname(imgurl), 'set.hdf5')
-        item['image'] = torch.randn(2048,14,14)
+        imgurl = item_vqa['image_name']
+        file_name = os.path.basename(imgurl)
+        path_hdf5 = os.path.join(self.opt['dir'], self.opt['images'],os.path.dirname(imgurl), 'set.hdf5')
+        path_txt = os.path.join(self.opt['dir'],self.opt['images'],os.path.dirname(imgurl), 'set.txt')
+        flag_exist = False
+        with open(path_txt, 'r') as handle:
+            for index, line in enumerate(handle):
+                if line == imgurl:
+                    flag_exist = True
+                    break
+        
+        if not flag_exist:
+            print(imgurl + " does not exist.")
+            # Cheap hack if image does not exist
+            item['image'] = torch.LongTensor(2048,14,14).zero_()
+        else:
+            hdf5_file = h5py.File(path_hdf5, 'r')['att']
+            item['image'] = torch.LongTensor(hdf5_file[index]) 
+        
         item['word_count'] = item_vqa['question_length']
         return item
 
