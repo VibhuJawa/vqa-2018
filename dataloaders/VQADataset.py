@@ -104,10 +104,10 @@ class VQADataset(AbstractVQADataset):
     def vocab_answers(self):
         return self.aid_to_ans
 
-    def data_loader(self, batch_size=10, num_workers=4, shuffle=False):
+    def data_loader(self, batch_size=10, num_workers=4, shuffle=False, pin_memory=False):
         return DataLoader(self,
                                batch_size=batch_size, shuffle=shuffle,
-                               num_workers=num_workers, pin_memory=True)
+                               num_workers=num_workers, pin_memory=pin_memory)
 
     def get_img_url(self, image):
         parts = image.split("_")
