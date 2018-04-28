@@ -30,7 +30,7 @@ parser.add_argument('--cuda', action='store_true', default=True,
                     help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=10, metavar='N',
+parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
 args.cuda = args.cuda and torch.cuda.is_available()
@@ -44,44 +44,41 @@ if args.cuda:
 opt = {'dir': '/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 if args.cuda:
-    kwargs = {'num_workers': args.num_workers, 'pin_memory': False}
+    kwargs = {'num_workers': int(args.num_workers), 'pin_memory': False}
 else:
-    kwargs = {'num_workers': args.num_workers, 'pin_memory': True}
+    kwargs = {'num_workers': int(args.num_workers), 'pin_memory': True}
 
 train_dataset = VQADataset("train", opt)
-train_loader = train_dataset.data_loader(kwargs, shuffle=True, batch_size=args.batch_size, **kwargs)
+train_loader = train_dataset.data_loader(shuffle=True, batch_size=args.batch_size, **kwargs)
 
-test_dataset = VQADataset("dev", opt)
+test_dataset = VQADataset("val", opt)
 test_loader = test_dataset.data_loader(shuffle=False, batch_size=args.test_batch_size, **kwargs)
 
 
 model = returnmodel(args.cuda, args.parallel)
+
 optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
 
 def train(epoch):
     begin = time.time()
     model.train()
     for batch_idx, data in enumerate(train_loader):
-        question, image, target = data['question'], data['image'].float(), data['answer']
-        output = model(question, image)
         if args.cuda:
-            question, image, target = data['question'].cuda(), data['image'].cuda(), data['answer'].cuda()
+            question, image, target = data['question'].cuda(), data['image'].float().cuda(), data['answer'].cuda()
         else:
-            question, image, target = data['question'], data['image'].cuda(), data['answer']
+            question, image, target = data['question'], data['image'].float(), data['answer']
 
         question, image, target = Variable(question), Variable(image), Variable(target)
         optimizer.zero_grad()
-        output = model(question)
+        output = model(question, image)
         loss = F.nll_loss(output, target)
         loss.backward()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
-            begin = time.time()
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tTime : {:.0f}'.format(
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}\tTime : {:.2f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                        100. * batch_idx / len(train_loader), loss.data[0], time.time() - begin))
-
-            
+            begin = time.time()
 def test(loss):
     begin = time.time()
 
@@ -89,13 +86,14 @@ def test(loss):
     test_loss = 0
     correct = 0
     for data in test_loader:
+       
         if args.cuda:
-            question, target = data['question'].cuda(), data['answer'].cuda()
+            question, image, target = data['question'].cuda(), data['image'].float().cuda(), data['answer'].cuda()
         else:
-            question, target = data['question'], data['answer']
+            question, image, target = data['question'], data['image'].float(), data['answer']
 
-        question, target = Variable(question, volatile=True), Variable(target)
-        output = model(question)
+        question, image, target = Variable(question), Variable(image), Variable(target)
+        output = model(question, image)
         test_loss += F.nll_loss(output, target, size_average=False).data[0]  # sum up batch loss
         pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
         correct += pred.eq(target.data.view_as(pred)).long().cpu().sum()
