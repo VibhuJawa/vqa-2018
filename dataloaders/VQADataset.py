@@ -74,7 +74,7 @@ class VQADataset(AbstractVQADataset):
         print(path_txt)
         with open(path_txt, 'r') as handle:
             for index, line in enumerate(handle):
-                if line == file_name:
+                if line.strip() == file_name.strip():
                     flag_exist = True
                     break
         
