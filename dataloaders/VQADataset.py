@@ -5,8 +5,9 @@ import torch
 import copy
 import numpy as np
 import h5py
-from .AbstractDataset import AbstractVQADataset
+from dataloaders.AbstractDataset import AbstractVQADataset
 from utils.dataloader import DataLoader
+
 
 class VQADataset(AbstractVQADataset):
     def __init__(self, data_split, opt):
@@ -67,19 +68,19 @@ class VQADataset(AbstractVQADataset):
                 item['answer'] = item_vqa['answer_aid']
         imgurl = item_vqa['image_name']
         file_name = os.path.basename(imgurl)
-        path_hdf5 = os.path.join(self.opt['dir'], self.opt['images'],os.path.dirname(imgurl), 'set.hdf5')
-        path_txt = os.path.join(self.opt['dir'],self.opt['images'],os.path.dirname(imgurl), 'set.txt')
+        path_hdf5 = os.path.join(self.opt['dir'], self.opt['images'], os.path.dirname(imgurl), 'set.hdf5')
+        path_txt = os.path.join(self.opt['dir'], self.opt['images'], os.path.dirname(imgurl), 'set.txt')
         flag_exist = False
         with open(path_txt, 'r') as handle:
             for index, line in enumerate(handle):
                 if line.strip() == file_name.strip():
                     flag_exist = True
                     break
-        
+
         if not flag_exist:
             print(imgurl + " does not exist.")
             # Cheap hack if image does not exist
-            item['image'] = torch.LongTensor(2048,14,14).zero_()
+            item['image'] = torch.LongTensor(2048, 14, 14).zero_()
         else:
             if path_hdf5 not in self.hdf5_file_dict:
                 hdf5_file = h5py.File(path_hdf5, 'r')['att']
@@ -87,8 +88,8 @@ class VQADataset(AbstractVQADataset):
             else:
                 hdf5_file = self.hdf5_file_dict[path_hdf5]
 
-            item['image'] = torch.LongTensor(hdf5_file[index]) 
-        
+            item['image'] = torch.LongTensor(hdf5_file[index])
+
         item['word_count'] = item_vqa['question_length']
         return item
 
@@ -106,8 +107,8 @@ class VQADataset(AbstractVQADataset):
 
     def data_loader(self, batch_size=10, num_workers=4, shuffle=False, pin_memory=False):
         return DataLoader(self,
-                               batch_size=batch_size, shuffle=shuffle,
-                               num_workers=num_workers, pin_memory=pin_memory)
+                          batch_size=batch_size, shuffle=shuffle,
+                          num_workers=num_workers, pin_memory=pin_memory)
 
     def get_img_url(self, image):
         parts = image.split("_")
