@@ -1,8 +1,7 @@
 #!/bin/bash
-#SBATCH -N 1 
 #SBATCH -n 4
-#SBATCH -p shared
-#SBATCH -t 0:20:0
+#SBATCH -p gpu 
+#SBATCH -t 01:0:0
 
 module load cuda/9.0
 #module load singularity/2.4
