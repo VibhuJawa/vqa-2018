@@ -4,7 +4,7 @@
 #SBATCH -p shared
 #SBATCH -t 0:20:0
 
-module load cuda/9.0
+#module load cuda/9.0
 #module load singularity/2.4
 python extract_annotations_interim.py --folder /home-3/pmahaja2@jhu.edu/scratch/vqa2018_data/
 python extract_annotations_processed.py --dir /home-3/pmahaja2@jhu.edu/scratch/vqa2018_data/

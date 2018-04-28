@@ -278,7 +278,7 @@ if __name__ == "__main__":
     parser.add_argument('--dir', default='data', type=str,
                         help='Root directory containing raw, interim and processed directories')
     parser.add_argument('--trainsplit', default='train', type=str, help='Options: train | trainval')
-    parser.add_argument('--nans', default=999999, type=int, help='Number of top answers for the final classifications')
+    parser.add_argument('--nans', default=2000, type=int, help='Number of top answers for the final classifications')
     parser.add_argument('--maxlength', default=26, type=int,
                         help='Max number of words in a caption. Captions longer get clipped')
     parser.add_argument('--minwcount', default=0, type=int,
