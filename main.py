@@ -18,8 +18,8 @@ parser.add_argument('--logdir', default="logs", type=str, help='log directory')
 
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
-parser.add_argument('--test-batch-size', type=int, default=1000, metavar='N',
-                    help='input batch size for testing (default: 1000)')
+parser.add_argument('--test-batch-size', type=int, default=256, metavar='N',
+                    help='input batch size for testing (default: 256)')
 parser.add_argument('--epochs', type=int, default=10, metavar='N',
                     help='number of epochs to train (default: 10)')
 parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
@@ -51,7 +51,7 @@ else:
     kwargs = {'num_workers': int(args.num_workers), 'pin_memory': True}
 
 
-opt = {'dir': '/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
+opt = {'dir': '/home-4/vjawa1@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 
 ################################################
