@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 
 class QuestionModel(nn.Module):
-    def __init__(self, embedding_size=300, hidden_size=256, question_vocab_size=13390, linear_size=2048):
+    def __init__(self, embedding_size=300, hidden_size=256, question_vocab_size=13395, linear_size=2048):
         super().__init__()
         self.embeddings = nn.Embedding(question_vocab_size, embedding_size, padding_idx=0)
         self.rnn = nn.LSTM(embedding_size, hidden_size, batch_first=True, bidirectional=True)
@@ -57,7 +57,7 @@ class MergedModel(nn.Module):
         return x
 
 
-def returnmodel(cuda=True, data_parallel=True, embedding_size=300, hidden_size=256, question_vocab_size=13391, linear_size=2048, num_classes=2000):
+def returnmodel(cuda=True, data_parallel=True, embedding_size=300, hidden_size=256, question_vocab_size=13395, linear_size=2048, num_classes=2000):
     data_parallel = cuda and data_parallel
 
     questionmodel = QuestionModel(embedding_size, hidden_size, question_vocab_size, linear_size)
