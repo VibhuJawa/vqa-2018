@@ -26,7 +26,7 @@ parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
                     help='learning rate (default: 0.1)')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
-parser.add_argument('--parallel', action='store_true', default=False,
+parser.add_argument('--parallel', action='store_true', default=True,
                     help='enables CUDA training')
 parser.add_argument('--num-workers',  default=8,
                     help='enables CUDA training')
@@ -135,6 +135,7 @@ def train(epoch, logger):
 
         optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_norm(model.parameters(), 5)
         if args.cuda:
             torch.cuda.synchronize()
         optimizer.step()
@@ -164,10 +165,10 @@ def test(logger, epoch):
     meters = logger.reset_meters('val')
     begin = time.time()
     for batch_idx, data in enumerate(test_loader):
-        batch_size = data['target'].size(0)
+        batch_size = data['answer'].size(0)
 
         if args.cuda:
-            question, image, target = data['question'].cuda(async=True), data['image'].float().cuda(async=True), data['answer'].cuda(async=True)
+            question, image, target = data['question'].cuda(), data['image'].float().cuda(), data['answer'].cuda()
         else:
             question, image, target = data['question'], data['image'].float(), data['answer']
 
@@ -178,7 +179,7 @@ def test(logger, epoch):
         loss = F.nll_loss(output, target).data[0]
         test_loss += loss  # sum up batch loss
 
-        meters['loss'].update(loss.data[0], n=batch_size)
+        meters['loss'].update(loss, n=batch_size)
 
         acc1, acc5 = utils.accuracy(output.data, target.data, topk=(1, 5))
         meters['acc1'].update(acc1[0], n=batch_size)
@@ -196,21 +197,24 @@ def test(logger, epoch):
 
 best_acc = 0
 for epoch in range(1, args.epochs + 1):
-    train(epoch, exp_logger)
+    #train(epoch, exp_logger)
     test_acc = test(exp_logger, epoch)
     is_best = test_acc  > best_acc
     if is_best:
         print("Saving model with {} accuracy".format(test_acc))
+    if args.cuda:
+        torch.cuda.synchronize()
+
     best_acc = max(test_acc, best_acc)
 
-    utils.save_checkpoint({
-        'epoch': epoch,
-        'best_acc1': best_acc,
-        'exp_logger': exp_logger
-    },
-        model.module.state_dict(),
-        optimizer.state_dict(),
-        logdir,
-        True,
-        True,
-        is_best)
+    #utils.save_checkpoint({
+    #    'epoch': epoch,
+    #    'best_acc1': best_acc,
+    #    'exp_logger': exp_logger
+    #},
+    #    model.module.state_dict(),
+    #    optimizer.state_dict(),
+    #    logdir,
+    #    True,
+    #    True,
+    #    is_best)
