@@ -15,7 +15,9 @@ class QuestionModel(nn.Module):
         # x stores integers and has shape [length, batch_size]
         x = self.embeddings(x)  # TODO
         # x now stores floats and has shape [length, batch_size, embedding_size]
-        x, final_states = self.rnn(x, initial_states)  # TODO
+        self.rnn.flatten_parameters()
+        _, final_states = self.rnn(x, initial_states)  # TODO
+        # x = torch.cat([x[-1,0] ,x[0][1]], dim=1)
         x = torch.cat([final_states[0][0], final_states[0][1]], dim=1)
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
@@ -41,17 +43,21 @@ class ImageModel(nn.Module):
 class MergedModel(nn.Module):
     def __init__(self, qmodel, imgmodel, concat_size=2048, num_classes=2000):
         super().__init__()
-        self.qmodel = qmodel
-        self.imgmodel = imgmodel
+        # self.qmodel = qmodel
+        # self.imgmodel = imgmodel
+        self.combined_models = nn.ModuleList([qmodel,imgmodel])
         self.avgpool = nn.AvgPool2d((2, 1))
         self.fc1 = nn.Linear(concat_size, num_classes)
 
     def forward(self, question, image):
-        q_out = self.qmodel(question)
-        img_out = self.imgmodel(image)
+        # q_out = self.qmodel(question)
+        # img_out = self.imgmodel(image)
+        q_out = self.combined_models[0](question)
+        img_out = self.combined_models[1](image)
         x = torch.stack([img_out, q_out], dim=1)
         x = self.avgpool(x)
-        x = x.squeeze()
+        # TODO check this 
+        x = x.squeeze(dim = 1)
         x = F.log_softmax(self.fc1(x), dim=1)
 
         return x
