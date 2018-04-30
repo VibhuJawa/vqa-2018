@@ -9,7 +9,7 @@ from dataloaders.VQADataset1 import VQADataset1
 from dataloaders.featureset import FeaturesDataset
 
 import time
-from models.combined_model import returnmodel
+from models.combined_model1 import returnmodel
 import numpy as np
 import os
 from utils import utils, logger

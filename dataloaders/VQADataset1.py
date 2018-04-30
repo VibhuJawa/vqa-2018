@@ -6,7 +6,7 @@ import copy
 import numpy as np
 import h5py
 from dataloaders.AbstractDataset import AbstractVQADataset
-from utils.dataloader import DataLoader
+from utils.dataloader1 import DataLoader
 
 
 class VQADataset1(AbstractVQADataset):
@@ -68,13 +68,12 @@ class VQADataset1(AbstractVQADataset):
             else:
                 item['answer'] = item_vqa['answer_aid']
         imgurl = item_vqa['image_name']
-        parent_dir = os.path.basename(imgurl)
-
+        parent_dir = os.path.dirname(imgurl)
         file_name = os.path.basename(imgurl)
         dataset = os.path.dirname(parent_dir)
-        split = os.path.basename(parent_dir)
-
-        item_img = self.img_feat_dict[dataset][split].get_by_name(file_name)
+        split = os.path.basename(parent_dir).replace("extracted_","")
+        
+        item_img = self.img_feat_dict[dataset][split].get_by_name(file_name.strip())
 
 
 
