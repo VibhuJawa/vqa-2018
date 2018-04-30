@@ -16,7 +16,7 @@ from utils import utils, logger
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
 parser.add_argument('--logdir', default="logs", type=str, help='log directory')
 
-parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+parser.add_argument('--batch-size', type=int, default=256, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='N',
                     help='input batch size for testing (default: 256)')
@@ -35,7 +35,7 @@ parser.add_argument('--cuda', action='store_true', default=True,
                     help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
-parser.add_argument('--log-interval', type=int, default=1000, metavar='N',
+parser.add_argument('--log-interval', type=int, default=20, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
 args.cuda = args.cuda and torch.cuda.is_available()
@@ -51,7 +51,7 @@ else:
     kwargs = {'num_workers': int(args.num_workers), 'pin_memory': True}
 
 
-opt = {'dir': '/home-4/vjawa1@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
+opt = {'dir': '/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 
 ################################################
@@ -105,7 +105,7 @@ def train(epoch, logger):
     begin = time.time()
     model.train()
     meters = logger.reset_meters('train')
-
+    start = time.time()
     for batch_idx, data in enumerate(train_loader):
         batch_size = data['question'].size(0)
 
@@ -143,10 +143,12 @@ def train(epoch, logger):
             torch.cuda.synchronize()
 
         meters['batch_time'].update(time.time() - begin, n=batch_size)
-        begin = time.time()
 
+        begin = time.time()
         optimizer.step()
         if batch_idx % args.log_interval == 0:
+            print("Time since last print : {}".format(time.time() - start))
+            start = time.time()
             print('Epoch: [{0}][{1}/{2}]\t'
                   'Time {batch_time.val:.3f} ({batch_time.avg:.3f})\t'
                   'Data {data_time.val:.3f} ({data_time.avg:.3f})\t'
@@ -156,7 +158,7 @@ def train(epoch, logger):
                    epoch, batch_idx, len(train_loader),
                    batch_time=meters['batch_time'], data_time=meters['data_time'],
                    loss=meters['loss'], acc1=meters['acc1'], acc5=meters['acc5']))
-
+  
     logger.log_meters('train', n=epoch)
 
 def test(logger, epoch):
@@ -197,7 +199,7 @@ def test(logger, epoch):
 
 best_acc = 0
 for epoch in range(1, args.epochs + 1):
-    #train(epoch, exp_logger)
+    train(epoch, exp_logger)
     test_acc = test(exp_logger, epoch)
     is_best = test_acc  > best_acc
     if is_best:
@@ -206,15 +208,16 @@ for epoch in range(1, args.epochs + 1):
         torch.cuda.synchronize()
 
     best_acc = max(test_acc, best_acc)
-
-    #utils.save_checkpoint({
-    #    'epoch': epoch,
-    #    'best_acc1': best_acc,
-    #    'exp_logger': exp_logger
-    #},
-    #    model.module.state_dict(),
-    #    optimizer.state_dict(),
-    #    logdir,
-    #    True,
-    #    True,
-    #    is_best)
+    print("Best accuracy so far :", best_acc)
+    utils.save_checkpoint({
+        'epoch': epoch,
+        'best_acc1': best_acc,
+        'exp_logger': exp_logger
+    },
+        model.state_dict(),
+        optimizer.state_dict(),
+        logdir,
+        True,
+        True,
+        #iTrue)
+        is_best)
