@@ -16,9 +16,8 @@ class AbstractVQADataset(data.Dataset):
 
         self.dir_processed = os.path.join(self.opt['dir'], 'processed')
         self.subdir_processed = self.subdir_processed()
-        print(self.subdir_processed)
         if not os.path.exists(self.subdir_processed):
-            print(self.subdir_processed)
+            print(self.subdir_processed, " does not exist.")
             self._processed()
 
         path_wid_to_word = os.path.join(self.subdir_processed, 'wid_to_word.pickle')
