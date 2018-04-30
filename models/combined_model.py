@@ -16,9 +16,11 @@ class QuestionModel(nn.Module):
         x = self.embeddings(x)  # TODO
         # x now stores floats and has shape [length, batch_size, embedding_size]
         self.rnn.flatten_parameters()
-        _, final_states = self.rnn(x, initial_states)  # TODO
+        x, final_states = self.rnn(x, initial_states)  # TODO
         # x = torch.cat([x[-1,0] ,x[0][1]], dim=1)
-        x = torch.cat([final_states[0][0], final_states[0][1]], dim=1)
+        self.rnn.flatten_parameters()
+        x = x[:,-1,:]
+        #x = torch.cat([final_states[0][0], final_states[0][1]], dim=1)
         x = F.relu(self.linear1(x))
         x = self.linear2(x)
 
