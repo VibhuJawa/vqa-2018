@@ -9,7 +9,7 @@ class FeaturesDataset(data.Dataset):
         self.data_split = data_split
         self.opt = opt
         self.dir_extract = os.path.join(self.opt['dir'], self.opt['images'], dataset,
-                                                                   'extracted', data_split)
+                                                                   'extracted_'+data_split)
         self.path_hdf5 = os.path.join(self.dir_extract, 'set.hdf5')
         assert os.path.isfile(self.path_hdf5), \
             'File not found in {}, you must extract the features first with extract.py'.format(self.path_hdf5)
@@ -18,8 +18,7 @@ class FeaturesDataset(data.Dataset):
         self.index_to_name, self.name_to_index = self._load_dicts()
 
     def _load_dicts(self):
-        self.path_fname = os.path.join(self.dir_extract,
-                                       self.data_split + 'set.txt')
+        self.path_fname = os.path.join(self.dir_extract, 'set.txt')
         with open(self.path_fname, 'r') as handle:
             self.index_to_name = handle.readlines()
         self.index_to_name = [name[:-1] for name in self.index_to_name]  # remove char '\n'
