@@ -141,7 +141,8 @@ def default_collate(batch):
                 continue
             elif key != 'word_count' or key != 'question':
                 temp_dict[key] = default_collate([d[key] for d in batch])
-                temp_dict[key].transpose_(0,1)
+                if key=='question':
+                    temp_dict[key].transpose_(0,1)
                 #       return {}
         return temp_dict
         # return {key: default_collate([d[key] for d in batch]) for key in batch[0]}
