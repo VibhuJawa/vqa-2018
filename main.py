@@ -145,7 +145,7 @@ def train(epoch, logger):
         meters['batch_time'].update(time.time() - begin, n=batch_size)
 
         begin = time.time()
-        optimizer.step()
+        #optimizer.step()
         if batch_idx % args.log_interval == 0:
             print("Time since last print : {}".format(time.time() - start))
             start = time.time()
@@ -209,15 +209,17 @@ for epoch in range(1, args.epochs + 1):
 
     best_acc = max(test_acc, best_acc)
     print("Best accuracy so far :", best_acc)
-    utils.save_checkpoint({
-        'epoch': epoch,
-        'best_acc1': best_acc,
-        'exp_logger': exp_logger
-    },
-        model.state_dict(),
-        optimizer.state_dict(),
-        logdir,
-        True,
-        True,
+    if is_best:
+        torch.save(model.state_dict(), os.path.join(opt['dir'], 'best_model_'+str(best_acc) +'.pt'))
+    #utils.save_checkpoint({
+    #    'epoch': epoch,
+    #    'best_acc1': best_acc,
+    #    'exp_logger': exp_logger
+    #},
+    #    model.state_dict(),
+    #    optimizer.state_dict(),
+    #    logdir,
+    #    True,
+    #    True,
         #iTrue)
-        is_best)
+    #    is_best)
