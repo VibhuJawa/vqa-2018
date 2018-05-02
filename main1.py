@@ -10,7 +10,8 @@ from dataloaders.featureset import FeaturesDataset
 
 import time
 #from models.combined_model import returnmodel
-from models.attention_model import returnmodel
+#from models.attention_model import returnmodel
+from models.stacked_attention_model import returnmodel
 
 import numpy as np
 import os
@@ -100,7 +101,7 @@ print("Time to load Dataset : ", time.time() - time1)
 
 
 model = returnmodel(args.cuda, args.parallel)
-optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum)
+optimizer = optim.Adam(model.parameters(), lr=args.lr, weight_decay=10e-5, momentum=args.momentum)
 
 ################################################
 # Count model parameters
