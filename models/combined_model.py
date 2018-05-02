@@ -10,7 +10,6 @@ class QuestionModel(nn.Module):
         self.rnn = nn.LSTM(embedding_size, hidden_size, batch_first=True, bidirectional=True)
         self.linear1 = torch.nn.Linear(hidden_size, (linear_size - hidden_size * 2) // 2)
         self.linear2 = torch.nn.Linear((linear_size - hidden_size * 2) // 2, linear_size)
-        self.dropout = torch.nn.Dropout(p=0.3)
     def forward(self, x, initial_states=None):
         # x stores integers and has shape [length, batch_size]
         
@@ -22,7 +21,7 @@ class QuestionModel(nn.Module):
         self.rnn.flatten_parameters()
         #x = x[:,-1,:]
         #x = torch.cat([final_states[0][0], final_states[0][1]], dim=1)
-        x = self.dropout(F.relu(self.linear1(x)))
+        x = F.relu(self.linear1(x))
         x = self.linear2(x)
 
         return x

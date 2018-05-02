@@ -12,7 +12,7 @@ class AttentionModel(nn.Module):
     def __init__(self, num_classes=2000, question_vocab_size=13995, embedding_size=256, hidden_size=512):
         super().__init__()
         self.embeddings = nn.Embedding(question_vocab_size, embedding_size, padding_idx=0)
-        self.rnn = nn.GRU(embedding_size + hidden_size, hidden_size, batch_first=False)
+        self.rnn = nn.GRU(embedding_size, hidden_size, batch_first=False)
         self.maxpool = nn.MaxPool2d((1, 2048), stride=1)
 
         self.context2embed = nn.Linear(hidden_size, embedding_size)
@@ -21,7 +21,8 @@ class AttentionModel(nn.Module):
 
         self.fc1 = nn.Linear(hidden_size, hidden_size * 2)
         self.fc2 = nn.Linear(hidden_size * 2, num_classes)
-        self.v = nn.Parameter(torch.FloatTensor(1, hidden_size + embedding_size))
+        self.fc3 = nn.Linear(hidden_size, embedding_size)
+        #self.v = nn.Parameter(torch.FloatTensor(1, hidden_size + embedding_size))
 
     def forward(self, question, image, hidden=None):
         max_len = question.size(1)  # Maximum length of question
@@ -44,20 +45,23 @@ class AttentionModel(nn.Module):
         for i in range(max_len):
             curr_word = embedded_questions[:, i, :].unsqueeze(dim=0)
             #             print("Dim of curr word ", curr_word.shape)
-            energy = torch.bmm(hidden.permute(1, 0, 2), img_hidden)
+            energy = F.tanh(torch.bmm(hidden.permute(1, 0, 2), img_hidden))
             #             print("Energy ", energy.shape)
             alpha = F.softmax(energy, dim=2)
             #             print("alpha ",alpha.shape)
             context = img_hidden * alpha
-            context_sum = context.sum(dim=2)
+            context_sum = context.sum(dim=2) # 512
             #             print("Context sum", context_sum.shape)
-            concat_word_img = torch.cat([curr_word, context_sum.unsqueeze(dim=0)], dim=2)
-            embedding_with_attention = self.v * concat_word_img
-            out, hidden = self.rnn(embedding_with_attention, hidden)
+            #concat_word_img = torch.cat([curr_word, context_sum.unsqueeze(dim=0)], dim=2)
+            context_sum2 = F.tanh(self.fc3(context_sum.unsqueeze(dim=0)))
+            
+            new_input = context_sum2 * curr_word
+            #embedding_with_attention = self.v * concat_word_img
+            out, hidden = self.rnn(new_input, hidden)
         # print(out.shape)
         x = out.squeeze(dim=0)
         x = F.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = F.log_softmax(self.fc2(x), dim=1)
         return x
 
 

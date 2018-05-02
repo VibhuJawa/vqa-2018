@@ -11,18 +11,19 @@ from models.combined_model import returnmodel
 import numpy as np
 import os
 from utils import utils, logger
+import sys
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
 parser.add_argument('--logdir', default="logs", type=str, help='log directory')
 
-parser.add_argument('--batch-size', type=int, default=256, metavar='N',
+parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
-parser.add_argument('--test-batch-size', type=int, default=256, metavar='N',
+parser.add_argument('--test-batch-size', type=int, default=64, metavar='N',
                     help='input batch size for testing (default: 256)')
-parser.add_argument('--epochs', type=int, default=10, metavar='N',
+parser.add_argument('--epochs', type=int, default=30, metavar='N',
                     help='number of epochs to train (default: 10)')
-parser.add_argument('--lr', type=float, default=0.1, metavar='LR',
+parser.add_argument('--lr', type=float, default=3e-4, metavar='LR',
                     help='learning rate (default: 0.1)')
 parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.9)')
@@ -146,6 +147,7 @@ def train(epoch, logger):
 
         begin = time.time()
         #optimizer.step()
+        
         if batch_idx % args.log_interval == 0:
             print("Time since last print : {}".format(time.time() - start))
             start = time.time()
@@ -159,6 +161,7 @@ def train(epoch, logger):
                    batch_time=meters['batch_time'], data_time=meters['data_time'],
                    loss=meters['loss'], acc1=meters['acc1'], acc5=meters['acc5']))
   
+        sys.stdout.flush()
     logger.log_meters('train', n=epoch)
 
 def test(logger, epoch):
