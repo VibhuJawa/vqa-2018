@@ -8,20 +8,21 @@ class QuestionModel(nn.Module):
         super().__init__()
         self.embeddings = nn.Embedding(question_vocab_size, embedding_size, padding_idx=0)
         self.rnn = nn.LSTM(embedding_size, hidden_size, batch_first=True, bidirectional=True)
-        self.linear1 = torch.nn.Linear(hidden_size * 2, (linear_size - hidden_size * 2) // 2)
+        self.linear1 = torch.nn.Linear(hidden_size, (linear_size - hidden_size * 2) // 2)
         self.linear2 = torch.nn.Linear((linear_size - hidden_size * 2) // 2, linear_size)
-
+        self.dropout = torch.nn.Dropout(p=0.3)
     def forward(self, x, initial_states=None):
         # x stores integers and has shape [length, batch_size]
+        
         x = self.embeddings(x)  # TODO
         # x now stores floats and has shape [length, batch_size, embedding_size]
         self.rnn.flatten_parameters()
         x, final_states = self.rnn(x, initial_states)  # TODO
-        # x = torch.cat([x[-1,0] ,x[0][1]], dim=1)
+        x = final_states[0][0] * final_states[0][1]
         self.rnn.flatten_parameters()
-        x = x[:,-1,:]
+        #x = x[:,-1,:]
         #x = torch.cat([final_states[0][0], final_states[0][1]], dim=1)
-        x = F.relu(self.linear1(x))
+        x = self.dropout(F.relu(self.linear1(x)))
         x = self.linear2(x)
 
         return x

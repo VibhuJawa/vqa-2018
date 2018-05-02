@@ -9,16 +9,17 @@ from dataloaders.VQADataset1 import VQADataset1
 from dataloaders.featureset import FeaturesDataset
 
 import time
-from models.combined_model1 import returnmodel
+from models.combined_model import returnmodel
 import numpy as np
 import os
 from utils import utils, logger
+import sys
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
 parser.add_argument('--logdir', default="logs", type=str, help='log directory')
 
-parser.add_argument('--batch-size', type=int, default=256, metavar='N',
+parser.add_argument('--batch-size', type=int, default=64, metavar='N',
                     help='input batch size for training (default: 64)')
 parser.add_argument('--test-batch-size', type=int, default=256, metavar='N',
                     help='input batch size for testing (default: 256)')
@@ -166,9 +167,9 @@ def train(epoch, logger):
         loss.backward()
         if args.cuda:
             torch.cuda.synchronize()
-        optimizer.step()
-        if args.cuda:
-            torch.cuda.synchronize()
+       # optimizer.step()
+        #if args.cuda:
+         #   torch.cuda.synchronize()
 
         meters['batch_time'].update(time.time() - begin, n=batch_size)
         begin = time.time()
@@ -187,7 +188,7 @@ def train(epoch, logger):
                 epoch, batch_idx, len(train_loader),
                 batch_time=meters['batch_time'], data_time=meters['data_time'],
                 loss=meters['loss'], acc1=meters['acc1'], acc5=meters['acc5']))
-
+            sys.stdout.flush()
     logger.log_meters('train', n=epoch)
 
 
@@ -213,7 +214,7 @@ def test(logger, epoch):
         loss = F.nll_loss(output, target).data[0]
         test_loss += loss  # sum up batch loss
 
-        meters['loss'].update(loss.data[0], n=batch_size)
+        meters['loss'].update(loss, n=batch_size)
 
         acc1, acc5 = utils.accuracy(output.data, target.data, topk=(1, 5))
         meters['acc1'].update(acc1[0], n=batch_size)
@@ -237,15 +238,17 @@ for epoch in range(1, args.epochs + 1):
     if is_best:
         print("Saving model with {} accuracy".format(test_acc))
     best_acc = max(test_acc, best_acc)
+    if is_best:
+        torch.save(model.state_dict(), os.path.join(opt['dir'], 'best_model_'+str(best_acc) +'.pt'))
 
-    utils.save_checkpoint({
-        'epoch': epoch,
-        'best_acc1': best_acc,
-        'exp_logger': exp_logger
-    },
-        model.state_dict(),
-        optimizer.state_dict(),
-        logdir,
-        True,
-        True,
-        is_best)
+    #utils.save_checkpoint({
+    #    'epoch': epoch,
+    #    'best_acc1': best_acc,
+    #    'exp_logger': exp_logger
+    #},
+    #    model.state_dict(),
+    #    optimizer.state_dict(),
+    #    logdir,
+    #    True,
+    #    True,
+    #    is_best)
