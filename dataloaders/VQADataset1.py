@@ -6,8 +6,8 @@ import copy
 import numpy as np
 import h5py
 from dataloaders.AbstractDataset import AbstractVQADataset
-#from utils.dataloader1 import DataLoader
-from torch.utils.data import DataLoader
+from utils.dataloader import DataLoader
+#from torch.utils.data import DataLoader
 
 class VQADataset1(AbstractVQADataset):
     def __init__(self, data_split, image_features, opt):
