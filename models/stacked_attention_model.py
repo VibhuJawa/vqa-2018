@@ -12,7 +12,7 @@ import torch.nn.functional as F
 
 class StackedAttentionModel(nn.Module):
     def __init__(self, num_classes=2000, question_vocab_size=13995, embedding_size=256,
-                 hidden_size=512, img_maps=2048, k=512):
+                 hidden_size=512, img_maps=2048, k=400):
         super().__init__()
         self.img_maps = img_maps
         # self.qmodel = qmodel
@@ -77,10 +77,10 @@ class StackedAttentionModel(nn.Module):
 
 
 def returnmodel(cuda=True, data_parallel=True, num_classes=2000, question_vocab_size=13995, embedding_size=256,
-                hidden_size=512, img_maps=2048, k=512):
+                hidden_size=512, img_maps=2048, k=400):
     data_parallel = cuda and data_parallel
 
-    model = StackedAttentionModel(num_classes, question_vocab_size, embedding_size, hidden_size, img_maps=2048, k=512)
+    model = StackedAttentionModel(num_classes, question_vocab_size, embedding_size, hidden_size, img_maps, k)
 
     if data_parallel:
         model = nn.DataParallel(model).cuda()
