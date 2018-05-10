@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row justify-content-md-center">
+        <div class="col-md-4 col-md-offset-4">
+            <form method="post" class="form-signin" enctype="multipart/form-data">
+                <p><input type="file" id="files" name="file" class="form-control" /></p>
+                <p><input name="question" class="form-control" id="question" placeholder="Enter your question here..." required></p>
+                <p style="text-align: right; margin-top: 20px;">
+                    <input type="submit" value="Upload Files" class="btn btn-lg btn-primary" />
+                </p>
+
+            </form>
+        </div>
+    </div>
+
+  <form method="post" action="/" enctype=multipart/form-data>
+  </form>
+{% endblock %}
