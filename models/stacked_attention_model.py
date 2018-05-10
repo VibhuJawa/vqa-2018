@@ -73,7 +73,7 @@ class StackedAttentionModel(nn.Module):
         ###########################
         # Done with last encoding
         ##############################
-        return F.softmax(self.fc1(visual_question_embedding_final), dim=1)
+        return F.log_softmax(self.fc1(visual_question_embedding_final), dim=1)
 
 
 def returnmodel(cuda=True, data_parallel=True, num_classes=2000, question_vocab_size=13995, embedding_size=256,
