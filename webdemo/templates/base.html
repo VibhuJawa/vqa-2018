@@ -1,0 +1,18 @@
+<!doctype html>
+<head>
+    <title>{% block title %}{% endblock %} Visual Question Answering </title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="text-center">
+<nav style="padding-bottom: 1rem!important; border-bottom:2px solid black;">
+    <h1>Visual Question Answering</h1>
+</nav>
+<div class="container-fluid" style="padding-top:20px; text-align: center">
+    {% for message in get_flashed_messages() %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+</div>
+</body>
+</html>
