@@ -1,17 +1,23 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
+from flask import Flask, render_template, send_from_directory, flash
 import os
 from flask import Flask, request, redirect, url_for
 from werkzeug.utils import secure_filename
 import sys
 from werkzeug import SharedDataMiddleware
+from test_new_forward_pass import *
 
-UPLOAD_FOLDER = 'uploads'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
+PROJECT_HOME = os.path.dirname(os.path.realpath(__file__))
+
 app = Flask(__name__)
+UPLOAD_FOLDER = 'static/images/'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-app.add_url_rule('/uploads/<filename>', 'uploaded_file',
+app.add_url_rule('/static/images/<filename>', 'uploaded_file',
                  build_only=True)
 app.wsgi_app = SharedDataMiddleware(app.wsgi_app, {
     '/uploads': app.config['UPLOAD_FOLDER']
@@ -27,13 +33,13 @@ def allowed_file(filename):
 def process_vqa():
     if request.method == "POST":
         return "LMAO"
-    print(request.args)
     image = request.args['filename']
     question = request.args['question']
 
     # PROCESS IMAGE ETC HERE
-
-    answers = [("yes", '90'), ('no', '5'), ('bhat bc', '5')]
+    answers = run_forward(image, question)
+    # answers = [("yes", '90'), ('no', '5'), ('bhat bc', '5')]
+    print(answers)
     return render_template('answer.html', image=image, question=question, answers=answers)
 
 
@@ -58,7 +64,8 @@ def index_function():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             # return "Uploaded"
             return redirect(url_for('process_vqa',
-                                    filename=filename, question=question))
+                                    filename=filename,
+                                    question=question))
     return render_template('index.html')
 
 
