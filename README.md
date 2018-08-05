@@ -1,4 +1,4 @@
-# VQA 2018
+# Visual Question Answering: May I Have Your Attention Please? 
 
 ## Project Overview
 
