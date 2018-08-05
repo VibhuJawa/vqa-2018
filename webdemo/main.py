@@ -71,4 +71,4 @@ def index_function():
 
 if __name__ == "__main__":
     app.secret_key = "super secret key"
-    app.run(debug=True)
+    app.run(debug=False, host=os.getenv('LISTEN', '0.0.0.0'))
