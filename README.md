@@ -55,20 +55,20 @@ Arguments to be provided:
 * nlp (Tokenization method) (options: nlp/mcb/naive)
 * pad (Padding space) (default: left/right)
 
-### Model Training:
+## Model Training:
 Run the following files for training the model.
 * stacked attention model [stacked_attention_model.py](stacked_attention_model.py)
 * Concat Image+Qustion embedding model [std_combined_model.py](std_combined_model.py)
 * Custom attention model [custom_attention_model.py](custom_attention_model.py)
 
-### Cool Implimetnation Detail to save computation:
+## Cool Implimetnation Detail to save computation:
 Here the custom change has been to pytorches dataloader to ensure that we can do padding based on the maximum of each batch even with pre-fetching with num_workers>2 in pytorch 0.3.1 . 
 
 This essentially helps us make sure that each question length processed by an lstm is the max of that batch and not the global max hence saving a lot of computation time. 
 
 Main Tweak: https://github.com/VibhuJawa/vqa-2018/blob/master/utils/dataloader1.py#L137
 
-### Combatibily:
+## Combatibily:
 This code was written for pytorch 0.3.1 and will break in pytorch 0.4.1 because of changes in syntax, please update changes on your own.
 
 
