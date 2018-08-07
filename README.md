@@ -40,12 +40,12 @@ Arguments to be provided:
 ### Extract Question/Answer Features 
 
 #### Interim Extract 
-Run [extract_annotations_interim.py] (extract_annotations_interim.py)
+Run [extract_annotations_interim.py](extract_annotations_interim.py)
 
 Creates a interim json for train,test,val and creates a mapping between image name and location extracted for downstream processing.
 
 #### Final Processing
-Run [extract_annotations_processed.py] (extract_annotations_processed.py)
+Run [extract_annotations_processed.py](extract_annotations_processed.py)
 
 Arguments to be provided:
 * dir (directory of the data)
@@ -66,7 +66,7 @@ Here the custom change has been to pytorches dataloader to ensure that we can do
 
 This essentially helps us make sure that each question length processed by an lstm is the max of that batch and not the global max hence saving a lot of computation time. 
 
-Change: https://github.com/VibhuJawa/vqa-2018/blob/master/utils/dataloader1.py#L137
+Main Tweak: https://github.com/VibhuJawa/vqa-2018/blob/master/utils/dataloader1.py#L137
 
 ### Combatibily:
 This code was written for pytorch 0.3.1 and will break in pytorch 0.4.1 because of changes in syntax, please update changes on your own.
