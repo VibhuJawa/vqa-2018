@@ -61,7 +61,7 @@ Run the following files for training the model.
 * Concat Image+Qustion embedding model [std_combined_model.py](std_combined_model.py)
 * Custom attention model [custom_attention_model.py](custom_attention_model.py)
 
-## Cool Implimetnation Detail to save computation:
+## Cool Implimentation detail to save computation time:
 Here the custom change has been to pytorches dataloader to ensure that we can do padding based on the maximum of each batch even with pre-fetching with num_workers>2 in pytorch 0.3.1 . 
 
 This essentially helps us make sure that each question length processed by an lstm is the max of that batch and not the global max hence saving a lot of computation time. 
