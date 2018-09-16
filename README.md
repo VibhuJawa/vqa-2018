@@ -16,7 +16,12 @@ We additionaly release an extremely lightweight yet modular code which can be us
 ## Project Report
 [Project Report](VQA.pdf)
 
-## [Demo Link](http://34.239.173.78:5000/process_vqa?filename=fullsizeoutput_2.jpeg&question=who+is+in+the+photo)
+## [Demo Link]
+
+* Update * 
+
+Demo is no longer live, ran out of aws credits.
+(http://34.239.173.78:5000/process_vqa?filename=fullsizeoutput_2.jpeg&question=who+is+in+the+photo)
 
 
 # Repo Setup Instructions:
