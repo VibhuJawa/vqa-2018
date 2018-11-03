@@ -62,10 +62,13 @@ opt = {'dir': '/home-3/vjawa1@jhu.edu/scratch/vqa2018_data', 'images': 'Images',
 ################################################
 # Create Dataset
 ################################################
-train_dataset = VQADataset("train", opt)
+#TODO change back to train
+train_dataset = VQADataset("dummydata_", opt)
+
 train_loader = train_dataset.data_loader(shuffle=True, batch_size=args.batch_size, **kwargs)
 
-test_dataset = VQADataset("val", opt)
+#TODO change back to val
+test_dataset = VQADataset("dummydata_", opt)
 test_loader = test_dataset.data_loader(shuffle=False, batch_size=args.test_batch_size, **kwargs)
 
 ################################################
