@@ -7,13 +7,18 @@ import torch.optim as optim
 from torch.autograd import Variable
 from dataloaders.VQADataset import VQADataset
 import time
-from models.attention_model import returnmodel
+from models.stacked_attention_model import returnmodel
+
+from tensorboardX import SummaryWriter
+
 import numpy as np
 import os
 from utils import utils, logger
 
+writer = SummaryWriter('stacked_attention_model',comment="Stacked Attention")
+
 # Training settings
-parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
+parser = argparse.ArgumentParser(description='Visual Question Answering')
 parser.add_argument('--logdir', default="logs", type=str, help='log directory')
 
 parser.add_argument('--batch-size', type=int, default=64, metavar='N',
@@ -31,7 +36,7 @@ parser.add_argument('--parallel', action='store_true', default=True,
 parser.add_argument('--num-workers',  default=8,
                     help='enables CUDA training')
 
-parser.add_argument('--cuda', action='store_true', default=True,
+parser.add_argument('--cuda', action='store_true', default=False,
                     help='enables CUDA training')
 parser.add_argument('--seed', type=int, default=1, metavar='S',
                     help='random seed (default: 1)')
@@ -51,7 +56,7 @@ else:
     kwargs = {'num_workers': int(args.num_workers), 'pin_memory': True}
 
 
-opt = {'dir': '/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
+opt = {'dir': '/home-3/vjawa1@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 
 ################################################
@@ -201,26 +206,26 @@ def test(logger, epoch):
 best_acc = 0
 for epoch in range(1, args.epochs + 1):
     train(epoch, exp_logger)
-    test_acc = test(exp_logger, epoch)
-    is_best = test_acc  > best_acc
-    if is_best:
-        print("Saving model with {} accuracy".format(test_acc))
-    if args.cuda:
-        torch.cuda.synchronize()
-
-    best_acc = max(test_acc, best_acc)
-    print("Best accuracy so far :", best_acc)
-    if is_best:
-        torch.save(model.state_dict(), os.path.join(opt['dir'], 'best_model_'+str(best_acc) +'.pt'))
-    #utils.save_checkpoint({
-    #    'epoch': epoch,
-    #    'best_acc1': best_acc,
-    #    'exp_logger': exp_logger
-    #},
-    #    model.state_dict(),
-    #    optimizer.state_dict(),
-    #    logdir,
-    #    True,
-    #    True,
-        #iTrue)
-    #    is_best)
+    # # test_acc = test(exp_logger, epoch)
+    # is_best = test_acc  > best_acc
+    # if is_best:
+    #     print("Saving model with {} accuracy".format(test_acc))
+    # if args.cuda:
+    #     torch.cuda.synchronize()
+    #
+    # best_acc = max(test_acc, best_acc)
+    # print("Best accuracy so far :", best_acc)
+    # if is_best:
+    #     torch.save(model.state_dict(), os.path.join(opt['dir'], 'best_model_'+str(best_acc) +'.pt'))
+    # #utils.save_checkpoint({
+    # #    'epoch': epoch,
+    # #    'best_acc1': best_acc,
+    # #    'exp_logger': exp_logger
+    # #},
+    # #    model.state_dict(),
+    # #    optimizer.state_dict(),
+    # #    logdir,
+    # #    True,
+    # #    True,
+    #     #iTrue)
+    # #    is_best)
