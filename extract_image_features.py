@@ -2,22 +2,14 @@ import argparse
 import os
 import time
 import h5py
-import numpy
-import logging
 
 import torch
-import torch.nn as nn
 import torch.nn.parallel
-import torch.backends.cudnn as cudnn
 from torch.autograd import Variable
 
 import torchvision.transforms as transforms
-import torchvision.datasets as datasets
-
 from models.extraction_model import get_pretrained_model
-# import vqa.models.convnets as convnets
-# import vqa.datasets as datasets
-# from vqa.lib.dataloader import DataLoader
+
 from utils.logger import AvgMeter
 from utils.ImagesFolder import ImagesFolder
 from torch.utils.data.dataloader import DataLoader
@@ -29,7 +21,7 @@ parser.add_argument('--dataset', default='mscocoa',
                     help='dataset type: mscoco (default) | abstract_v002')
 
 # TODO change it default folder on MARCC ~/scratch/vqa2018-data/Images/
-parser.add_argument('--vqa_data', default='/home-3/pmahaja2@jhu.edu/scratch/vqa2018_data/Images/',
+parser.add_argument('--vqa_data', default='data/Images/',
                     help='dir dataset to download or/and load images')
 
 parser.add_argument('--data_split', default='train2014', required=True, type=str,
@@ -69,11 +61,12 @@ def main():
 
     dataset_folder = os.path.join(args.vqa_data, args.dataset)
     split_folder = os.path.join(dataset_folder, args.data_split)
-
+    print(split_folder)
     assert os.path.exists(split_folder)
 
     normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406],
                                      std=[0.229, 0.224, 0.225])
+
 
     dataset = ImagesFolder(split_folder, transform=transforms.Compose([
         transforms.Resize(args.size),
@@ -105,8 +98,7 @@ def extract(data_loader, model, path_file):
     hdf5_file = h5py.File(path_hdf5, 'w')
 
     # estimate output shapes
-    output = model(Variable(torch.ones(1, 3, args.size, args.size),
-                            volatile=True))
+    output = model(torch.ones(1, 3, args.size, args.size))
     print(output.shape)
     print(type(output))
     nb_images = len(data_loader.dataset)
@@ -123,16 +115,18 @@ def extract(data_loader, model, path_file):
     end = time.time()
 
     idx = 0
+    print("Started Extraction")
     for i, input in enumerate(data_loader):
-        input_var = Variable(input['visual'], volatile=True)
+        input_var = input['visual']
         output_att = model(input_var)
+
+
         
 
         batch_size = output_att.size(0)
         hdf5_att[idx:idx + batch_size] = output_att.data.cpu().numpy()
         idx += batch_size
 
-        torch.cuda.synchronize()
         batch_time.update(time.time() - end)
         end = time.time()
 
