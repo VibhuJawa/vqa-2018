@@ -15,7 +15,10 @@ import numpy as np
 import os
 from utils import utils, logger
 
-writer = SummaryWriter('stacked_attention_model',comment="Stacked Attention")
+model_details = "stacked_attention_concat_model"
+
+tensorboard_writer = SummaryWriter('logs/stacked_attention_concat_model'.format(model_details),comment="Stacked Attention Model")
+
 
 # Training settings
 parser = argparse.ArgumentParser(description='Visual Question Answering')
@@ -56,7 +59,7 @@ else:
     kwargs = {'num_workers': int(args.num_workers), 'pin_memory': True}
 
 
-opt = {'dir': '/home-3/vjawa1@jhu.edu/scratch/vqa2018_data', 'images': 'Images', 'nans': 2000, 'sampleans': True,
+opt = {'dir': 'data/', 'images': 'Images', 'nans': 2000, 'sampleans': True,
        'maxlength': 26, 'minwcount': 0, 'nlp': 'mcb', 'pad': 'left'}
 
 ################################################
@@ -109,7 +112,7 @@ if exp_logger is None:
 
 
 
-def train(epoch, logger):
+def train(epoch, logger,tensorboard_writer):
     begin = time.time()
     model.train()
     meters = logger.reset_meters('train')
@@ -121,7 +124,7 @@ def train(epoch, logger):
         meters['data_time'].update(time.time() - begin, n=batch_size)
 
         if args.cuda:
-            question, image, target = data['question'].cuda(), data['image'].float().cuda(), data['answer'].cuda(async=True)
+            question, image, target = data['question'].cuda(), data['image'].float().cuda(), data['answer'].cuda()
         else:
             question, image, target = data['question'], data['image'].float(), data['answer']
 
@@ -134,16 +137,21 @@ def train(epoch, logger):
         loss = F.nll_loss(output, target)
 
         # Log the loss
-        meters['loss'].update(loss.data[0], n=batch_size)
+        meters['loss'].update(loss.item(), n=batch_size)
 
         # Measure accuracy
         acc1, acc5 = utils.accuracy(output.data, target.data, topk=(1, 5))
         meters['acc1'].update(acc1[0], n=batch_size)
         meters['acc5'].update(acc5[0], n=batch_size)
 
+        tensorboard_writer.add_scalar("train loss",loss.item(), epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train top1 acc",acc1[0], epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train top 5 acc ",acc5[0], epoch*len(train_loader)+batch_idx)
+
+
         optimizer.zero_grad()
         loss.backward()
-        torch.nn.utils.clip_grad_norm(model.parameters(), 5)
+        torch.nn.utils.clip_grad_norm_(model.parameters(), 5)
         if args.cuda:
             torch.cuda.synchronize()
         optimizer.step()
@@ -196,6 +204,11 @@ def test(logger, epoch):
         meters['acc1'].update(acc1[0], n=batch_size)
         meters['acc5'].update(acc5[0], n=batch_size)
 
+        tensorboard_writer.add_scalar("Test loss",loss.item(), epoch*len(test_loader)+batch_idx)
+        tensorboard_writer.add_scalar("Test top1 acc",acc1[0], epoch*len(test_loader)+batch_idx)
+        tensorboard_writer.add_scalar("Test top 5 acc ",acc5[0], epoch*len(test_loader)+batch_idx)
+
+
         meters['batch_time'].update(time.time() - begin, n=batch_size)
 
 
@@ -208,7 +221,7 @@ def test(logger, epoch):
 
 best_acc = 0
 for epoch in range(1, args.epochs + 1):
-    train(epoch, exp_logger)
+    train(epoch, exp_logger,tensorboard_writer)
     # # test_acc = test(exp_logger, epoch)
     # is_best = test_acc  > best_acc
     # if is_best:
@@ -232,3 +245,4 @@ for epoch in range(1, args.epochs + 1):
     # #    True,
     #     #iTrue)
     # #    is_best)
+tensorboard_writer.close()
