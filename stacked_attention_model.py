@@ -18,6 +18,12 @@ import os
 from utils import utils, logger
 import sys
 
+model_details = "stacked_attention_concat_model"
+
+from tensorboardX import SummaryWriter
+
+tensorboard_writer = SummaryWriter('logs/stacked_attention_concat_model'.format(model_details),comment="Stacked Attention Model")
+
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch MNIST Example')
 parser.add_argument('--logdir', default="logs", type=str, help='log directory')
@@ -159,13 +165,18 @@ def train(epoch, logger):
         loss = F.nll_loss(output, target)
 
         # Log the loss
-        meters['loss'].update(loss.data[0], n=batch_size)
+        meters['loss'].update(loss.item(), n=batch_size)
 
         # Measure accuracy
         acc1, acc5 = utils.accuracy(output.data, target.data, topk=(1, 5))
         meters['acc1'].update(acc1[0], n=batch_size)
         meters['acc5'].update(acc5[0], n=batch_size)
         #print(loss)
+        tensorboard_writer.add_scalar("train loss",loss.item(), epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train top1 acc",acc1[0], epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train top 5 acc ",acc5[0], epoch*len(train_loader)+batch_idx)
+
+
         optimizer.zero_grad()
         loss.backward()
         torch.nn.utils.clip_grad_norm(model.parameters(), 5)
@@ -217,13 +228,17 @@ def test(logger, epoch):
         # Compute output and loss
         output = model(question, image)
         loss = F.nll_loss(output, target).data[0]
-        test_loss += loss  # sum up batch loss
+        test_loss += loss.item()  # sum up batch loss
 
-        meters['loss'].update(loss, n=batch_size)
+        meters['loss'].update(loss.item(), n=batch_size)
 
         acc1, acc5 = utils.accuracy(output.data, target.data, topk=(1, 5))
         meters['acc1'].update(acc1[0], n=batch_size)
         meters['acc5'].update(acc5[0], n=batch_size)
+
+        tensorboard_writer.add_scalar("Test loss", loss.item(), epoch * len(test_loader) + batch_idx)
+        tensorboard_writer.add_scalar("Test top1 acc", acc1[0], epoch * len(test_loader) + batch_idx)
+        tensorboard_writer.add_scalar("Test top 5 acc ", acc5[0], epoch * len(test_loader) + batch_idx)
 
         meters['batch_time'].update(time.time() - begin, n=batch_size)
 
