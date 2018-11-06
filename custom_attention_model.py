@@ -17,7 +17,7 @@ from utils import utils, logger
 
 model_details = "stacked_attention_concat_model"
 
-tensorboard_writer = SummaryWriter('logs/stacked_attention_concat_model'.format(model_details),comment="Stacked Attention Model")
+tensorboard_writer = SummaryWriter('logs/custom_attention_concat_model_2'.format(model_details),comment="Stacked Attention Model")
 
 
 # Training settings
@@ -144,9 +144,9 @@ def train(epoch, logger,tensorboard_writer):
         meters['acc1'].update(acc1[0], n=batch_size)
         meters['acc5'].update(acc5[0], n=batch_size)
 
-        tensorboard_writer.add_scalar("train loss",loss.item(), epoch*len(train_loader)+batch_idx)
-        tensorboard_writer.add_scalar("train top1 acc",acc1[0], epoch*len(train_loader)+batch_idx)
-        tensorboard_writer.add_scalar("train top 5 acc ",acc5[0], epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train_loss",loss.item(), epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train_top1_acc",acc1[0], epoch*len(train_loader)+batch_idx)
+        tensorboard_writer.add_scalar("train-top_5_acc ",acc5[0], epoch*len(train_loader)+batch_idx)
 
 
         optimizer.zero_grad()
@@ -204,9 +204,9 @@ def test(logger, epoch):
         meters['acc1'].update(acc1[0], n=batch_size)
         meters['acc5'].update(acc5[0], n=batch_size)
 
-        tensorboard_writer.add_scalar("Test loss",loss.item(), epoch*len(test_loader)+batch_idx)
-        tensorboard_writer.add_scalar("Test top1 acc",acc1[0], epoch*len(test_loader)+batch_idx)
-        tensorboard_writer.add_scalar("Test top 5 acc ",acc5[0], epoch*len(test_loader)+batch_idx)
+        tensorboard_writer.add_scalar("Test_loss",loss.item(), epoch*len(test_loader)+batch_idx)
+        tensorboard_writer.add_scalar("Test_top1_acc",acc1[0], epoch*len(test_loader)+batch_idx)
+        tensorboard_writer.add_scalar("Test_top5_acc ",acc5[0], epoch*len(test_loader)+batch_idx)
 
 
         meters['batch_time'].update(time.time() - begin, n=batch_size)
@@ -221,13 +221,18 @@ def test(logger, epoch):
 
 best_acc = 0
 for epoch in range(1, args.epochs + 1):
+    print(epoch)
+
     train(epoch, exp_logger,tensorboard_writer)
-    # # test_acc = test(exp_logger, epoch)
-    # is_best = test_acc  > best_acc
-    # if is_best:
-    #     print("Saving model with {} accuracy".format(test_acc))
-    # if args.cuda:
-    #     torch.cuda.synchronize()
+    test_acc = test(exp_logger, epoch)
+    is_best = test_acc  > best_acc
+    if is_best:
+         print("Saving model with {} accuracy".format(test_acc))
+    if is_best:
+        torch.save(model.state_dict(), os.path.join(opt['dir'], 'custom_attaention_best_model_' + str(best_acc) + '.pt'))
+
+    if args.cuda:
+         torch.cuda.synchronize()
     #
     # best_acc = max(test_acc, best_acc)
     # print("Best accuracy so far :", best_acc)
