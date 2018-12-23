@@ -67,11 +67,15 @@ Run the following files for training the model.
 * Custom attention model [custom_attention_model.py](custom_attention_model.py)
 
 ## Cool Implimentation detail to save computation time:
-Here the custom change has been to pytorches dataloader to ensure that we can do padding based on the maximum of each batch even with pre-fetching with num_workers>2 in pytorch 0.3.1 . 
 
+Here the custom change has been to pytorches dataloader to ensure that we can do padding based on the maximum of each batch even with pre-fetching with num_workers>2 in pytorch 0.3.1 . 
 This essentially helps us make sure that each question length processed by an lstm is the max of that batch and not the global max hence saving a lot of computation time. 
 
+## This tweak is no longer needed. Use [padded sequence](https://pytorch.org/docs/stable/nn.html#pad-packed-sequence) instead. 
+
 Main Tweak: https://github.com/VibhuJawa/vqa-2018/blob/master/utils/dataloader1.py#L137
+
+##### No Longer Needed
 
 ## Combatibily:
 This code was written for pytorch 0.3.1 and will break in pytorch 0.4.1 because of changes in syntax, please update changes on your own.
